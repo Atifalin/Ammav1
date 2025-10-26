@@ -34,9 +34,11 @@ export function SignInScreen({ onSignUpPress }: SignInScreenProps) {
     setLoading(true);
     try {
       await signIn(email.trim(), password);
+      // Success - navigation will happen automatically via AuthContext
     } catch (error) {
-      Alert.alert('Error', error instanceof Error ? error.message : 'Failed to sign in');
-    } finally {
+      // Only show error if sign-in actually failed
+      console.error('Sign in error:', error);
+      Alert.alert('Sign In Failed', error instanceof Error ? error.message : 'Failed to sign in');
       setLoading(false);
     }
   };
