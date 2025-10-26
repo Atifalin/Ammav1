@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { AuthProvider } from '../contexts/AuthContext';
+
 interface AppProvidersProps {
   children: ReactNode;
 }
@@ -15,7 +17,9 @@ export function AppProviders({ children }: AppProvidersProps) {
   return (
     <GestureHandlerRootView style={styles.container}>
       <SafeAreaProvider>
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>{children}</AuthProvider>
+        </QueryClientProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

@@ -4,12 +4,15 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Platform } from 'react-native';
 
+import { useAuth } from '../contexts/AuthContext';
 import { colors } from '../theme';
+import { SignInScreen } from '../screens/auth/SignInScreen';
+import { SignUpScreen } from '../screens/auth/SignUpScreen';
 import { DashboardScreen } from '../screens/DashboardScreen';
 import { HomeScreen } from '../screens/HomeScreen';
 import { LogScreen } from '../screens/LogScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
-import type { MainTabParamList, RootStackParamList } from './types';
+import type { AuthStackParamList, MainTabParamList, RootStackParamList } from './types';
 
 const navigationTheme = {
   ...DefaultTheme,
@@ -24,6 +27,7 @@ const navigationTheme = {
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
+const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 const tabIconMap: Record<keyof MainTabParamList, keyof typeof Ionicons.glyphMap> = {
@@ -32,6 +36,22 @@ const tabIconMap: Record<keyof MainTabParamList, keyof typeof Ionicons.glyphMap>
   Dashboard: 'stats-chart',
   Settings: 'settings',
 };
+
+function AuthNavigator() {
+  return (
+    <AuthStack.Navigator screenOptions={{ headerShown: false }}>
+      <AuthStack.Screen name="SignIn">
+        {(props) => (
+          <SignInScreen
+            {...props}
+            onSignUpPress={() => props.navigation.navigate('SignUp')}
+          />
+        )}
+      </AuthStack.Screen>
+      <AuthStack.Screen name="SignUp" component={SignUpScreen} />
+    </AuthStack.Navigator>
+  );
+}
 
 function MainTabs() {
   return (
@@ -64,10 +84,20 @@ function MainTabs() {
 }
 
 export function AppNavigator() {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return null; // Or a loading screen
+  }
+
   return (
     <NavigationContainer theme={navigationTheme}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="MainTabs" component={MainTabs} />
+        {user ? (
+          <Stack.Screen name="MainTabs" component={MainTabs} />
+        ) : (
+          <Stack.Screen name="Auth" component={AuthNavigator} />
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );
